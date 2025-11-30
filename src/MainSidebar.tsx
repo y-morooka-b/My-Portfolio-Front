@@ -1,5 +1,6 @@
 import "./components_css/MainSidebar.css";
 import HomeIcon from '@mui/icons-material/Home';
+import CategoryIcon from '@mui/icons-material/Category';
 
 export const MainSidebar = () => {
     let sidebar_data = [
@@ -7,6 +8,11 @@ export const MainSidebar = () => {
             title: "ホーム",
             icon: <HomeIcon />,
             link: "/"
+        },
+        {
+            title: "カテゴリ管理",
+            icon: <CategoryIcon />,
+            link: "/category_management"
         }
     ];
 
