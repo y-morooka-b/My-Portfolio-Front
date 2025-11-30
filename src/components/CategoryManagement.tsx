@@ -31,7 +31,6 @@ const CategoryManagement = () => {
                 get_categories(setCategoryResponse);
             }
         )
-
     }
 
     return (
@@ -76,7 +75,7 @@ const CategoryManagement = () => {
                                 ? <div>Loading...</div>
                                 : categoryResponse.categories.length === 0
                                     ? <div>No categories</div>
-                                    : <CreateCategoryTable categories={categoryResponse.categories}/>
+                                    : <CreateCategoryTable categories={categoryResponse.categories} is_manage={true}/>
                         }
                     </div>
                 </div>
