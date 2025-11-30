@@ -1,5 +1,6 @@
 import "./components_css/App.css";
 import Home from "./components/Home";
+import CategoryManagement from "./components/CategoryManagement";
 import {MainSidebar} from "./MainSidebar";
 
 function App() {
@@ -13,6 +14,8 @@ function App() {
                     switch (window.location.pathname) {
                         case "/":
                             return <Home />;
+                        case "/category_management" :
+                            return <CategoryManagement />;
                         default:
                             return <Home />;
                     }
