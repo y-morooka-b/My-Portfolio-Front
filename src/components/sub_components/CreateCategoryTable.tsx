@@ -3,10 +3,15 @@ import {Categories} from "../../libraries/transceiver/get_categories";
 import {create_hash} from "../../libraries/hash_library";
 import {del_category} from "../../libraries/transceiver/del_category";
 import {ChangeEvent, useCallback, useEffect, useState} from "react";
-import { update_category } from "../../libraries/transceiver/update_category";
+import {update_category} from "../../libraries/transceiver/update_category";
 
 const CATEGORY_TYPE_EXPENDITURE = 0;
 const CATEGORY_TYPE_INCOME = 1;
+
+const background_color_list = [
+    'registered-categories-expenditure',
+    'registered-categories-income'
+];
 
 /**
  * カテゴリオブジェクトのリストからHTMLテーブルを生成する
@@ -41,14 +46,14 @@ const CreateCategoryTable = ({categories, is_manage}: {
             <tbody>
             {
                 is_manage
-                ? categories.map(category => {
-                     const hash = 'CategoryTable-' +  create_hash(category.id + category.name + category.type);
-                     return <CreateCategoryManageSet key={hash} key_hash={hash} category={category}/>
-                 })
-                : categories.map(category => {
-                     const hash = create_hash(category.id + category.name + category.type);
-                     return <CreateCategorySet key={`CategoryTable-${hash}`} category={category} income_and_expenditure={income_and_expenditure}/>
-                 })
+                    ? categories.map(category => {
+                        const hash = 'CategoryTable-' + create_hash(category.id + category.name + category.type);
+                        return <CreateCategoryManageSet key={hash} key_hash={hash} category={category}/>
+                    })
+                    : categories.map(category => {
+                        const hash = create_hash(category.id + category.name + category.type);
+                        return <CreateCategorySet key={`CategoryTable-${hash}`} category={category} income_and_expenditure={income_and_expenditure}/>
+                    })
             }
             </tbody>
         </table>
@@ -69,7 +74,7 @@ const CreateCategorySet = ({category, income_and_expenditure}: {
     income_and_expenditure: String[]
 }): JSX.Element => {
     return (
-        <tr>
+        <tr className={background_color_list[category.type]}>
             <td>{category.id}</td>
             <td>{category.name}</td>
             <td>{income_and_expenditure[category.type]}</td>
@@ -101,11 +106,10 @@ const CreateCategoryManageSet = ({key_hash, category}: {
 
     }, [category]);
 
-    const handleInputChangeName= (event:ChangeEvent<HTMLInputElement>) => {
+    const handleInputChangeName = (event: ChangeEvent<HTMLInputElement>) => {
         setCategoryName(event.target.value);
     };
-    const handleInputChangeType= (event:ChangeEvent<HTMLInputElement>) => {
-        console.log(Number(event.target.value));
+    const handleInputChangeType = (event: ChangeEvent<HTMLInputElement>) => {
         setCategoryType(Number(event.target.value));
     };
 
@@ -113,12 +117,11 @@ const CreateCategoryManageSet = ({key_hash, category}: {
         del_category(category.id);
     }, [category.id]);
     const updateButtonHandler = useCallback(() => {
-        console.log(categoryName, categoryType);
         update_category(category.id, categoryName, categoryType);
     }, [category.id, categoryName, categoryType]);
 
     return (
-        <tr>
+        <tr className={background_color_list[category.type]}>
             <td>{category.id}</td>
             <td>
                 <input
@@ -151,8 +154,12 @@ const CreateCategoryManageSet = ({key_hash, category}: {
                     /> 収入
                 </div>
             </td>
-            <td><button onClick={updateButtonHandler}>更新</button></td>
-            <td><button onClick={delButtonHandler}>削除</button></td>
+            <td>
+                <button onClick={updateButtonHandler}>更新</button>
+            </td>
+            <td>
+                <button onClick={delButtonHandler}>削除</button>
+            </td>
         </tr>
     );
 }

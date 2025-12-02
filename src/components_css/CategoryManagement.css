@@ -14,7 +14,15 @@ th, td {
     margin-left: auto;
 }
 
-.category-management-function{
+.category-management-function {
     width: 1000px;
     margin-left: 0;
+}
+
+.registered-categories-expenditure {
+    background-color: #3c2f54;
+}
+
+.registered-categories-income {
+    background-color: #444034;
 }
