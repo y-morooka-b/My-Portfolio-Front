@@ -37,9 +37,10 @@ const CategoryManagement = () => {
         <>
             <h2>カテゴリ管理</h2>
             <br/>
-            <div className="container-md">
+            <div className="container-lg category-management-function">
                 <div className="row">
                     <div className="col">
+                        <h3>カテゴリ追加</h3>
                         <form id="add-category-form" action={category_registration}>
                             <table>
                                 <tbody>
@@ -48,7 +49,7 @@ const CategoryManagement = () => {
                                     <td><input type="text" name="category_name"/></td>
                                 </tr>
                                 <tr>
-                                    <th><label>カテゴリタイプ</label></th>
+                                    <th><label>カテゴリタイプ(収支)</label></th>
                                     <td>
                                         <div>
                                             <input type="radio" name="category_type" value="0" defaultChecked/> 支出
@@ -70,6 +71,7 @@ const CategoryManagement = () => {
                         </form>
                     </div>
                     <div className="col">
+                        <h3>登録済みカテゴリ</h3>
                         {
                             categoryResponse === undefined
                                 ? <div>Loading...</div>

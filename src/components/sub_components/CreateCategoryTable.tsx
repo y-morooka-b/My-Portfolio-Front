@@ -1,8 +1,12 @@
 import {JSX} from "react/jsx-runtime";
 import {Categories} from "../../libraries/transceiver/get_categories";
 import {create_hash} from "../../libraries/hash_library";
-import { del_category } from "../../libraries/transceiver/del_category";
-import { useCallback } from "react";
+import {del_category} from "../../libraries/transceiver/del_category";
+import {ChangeEvent, useCallback, useEffect, useState} from "react";
+import { update_category } from "../../libraries/transceiver/update_category";
+
+const CATEGORY_TYPE_EXPENDITURE = 0;
+const CATEGORY_TYPE_INCOME = 1;
 
 /**
  * カテゴリオブジェクトのリストからHTMLテーブルを生成する
@@ -16,13 +20,10 @@ const CreateCategoryTable = ({categories, is_manage}: {
     categories: Categories[],
     is_manage: boolean
 }): JSX.Element => {
-    console.log(categories);
-
     let income_and_expenditure = [
         '支出',
         '収入'
     ];
-
 
     return (
         <table>
@@ -41,11 +42,11 @@ const CreateCategoryTable = ({categories, is_manage}: {
             {
                 is_manage
                 ? categories.map(category => {
-                     const hash = create_hash(category.id + category.name + category.type).toString();
-                     return <CreateCategoryManageSet key={`CategoryTable-${hash}`} category={category} income_and_expenditure={income_and_expenditure}/>
+                     const hash = 'CategoryTable-' +  create_hash(category.id + category.name + category.type);
+                     return <CreateCategoryManageSet key={hash} key_hash={hash} category={category}/>
                  })
                 : categories.map(category => {
-                     const hash = create_hash(category.id + category.name + category.type).toString();
+                     const hash = create_hash(category.id + category.name + category.type);
                      return <CreateCategorySet key={`CategoryTable-${hash}`} category={category} income_and_expenditure={income_and_expenditure}/>
                  })
             }
@@ -79,28 +80,78 @@ const CreateCategorySet = ({category, income_and_expenditure}: {
 /**
  * カテゴリ管理のデータを表示するためのテーブル行を生成する関数コンポーネント
  *
+ * @param {String} hash - キー用のハッシュ
  * @param {Object} props - コンポーネントに渡されるプロパティオブジェクト
  * @param {Categories} props.category - カテゴリの詳細情報を含むオブジェクト
  * @param {String[]} props.income_and_expenditure - 収支情報を表す文字列の配列
  *
  * @returns {JSX.Element} カテゴリデータを持つテーブル行を表すJSX要素
  */
-const CreateCategoryManageSet = ({category, income_and_expenditure}: {
+const CreateCategoryManageSet = ({key_hash, category}: {
+    key_hash: String,
     category: Categories,
-    income_and_expenditure: String[]
 }): JSX.Element => {
 
+    const [categoryName, setCategoryName] = useState('');
+    const [categoryType, setCategoryType] = useState(0);
+
+    useEffect(() => {
+        setCategoryName(category.name);
+        setCategoryType(category.type);
+
+    }, [category]);
+
+    const handleInputChangeName= (event:ChangeEvent<HTMLInputElement>) => {
+        setCategoryName(event.target.value);
+    };
+    const handleInputChangeType= (event:ChangeEvent<HTMLInputElement>) => {
+        console.log(Number(event.target.value));
+        setCategoryType(Number(event.target.value));
+    };
+
     const delButtonHandler = useCallback(() => {
-        console.log(category);
         del_category(category.id);
-    }, []);
+    }, [category.id]);
+    const updateButtonHandler = useCallback(() => {
+        console.log(categoryName, categoryType);
+        update_category(category.id, categoryName, categoryType);
+    }, [category.id, categoryName, categoryType]);
 
     return (
         <tr>
             <td>{category.id}</td>
-            <td>{category.name}</td>
-            <td>{income_and_expenditure[category.type]}</td>
-            <td></td>
+            <td>
+                <input
+                    key={`${key_hash}-category_name`}
+                    type="text"
+                    name={`${key_hash}-category_name`}
+                    value={categoryName}
+                    onChange={handleInputChangeName}
+                />
+            </td>
+            <td>
+                <div>
+                    <input
+                        key={`${key_hash}-category_type-expenditure`}
+                        type="radio"
+                        name={`${key_hash}-category_type`}
+                        value={CATEGORY_TYPE_EXPENDITURE}
+                        onChange={handleInputChangeType}
+                        checked={categoryType === CATEGORY_TYPE_EXPENDITURE}
+                    /> 支出
+                </div>
+                <div>
+                    <input
+                        key={`${key_hash}-category_type-income`}
+                        type="radio"
+                        name={`${key_hash}-category_type`}
+                        value={CATEGORY_TYPE_INCOME}
+                        onChange={handleInputChangeType}
+                        checked={categoryType === CATEGORY_TYPE_INCOME}
+                    /> 収入
+                </div>
+            </td>
+            <td><button onClick={updateButtonHandler}>更新</button></td>
             <td><button onClick={delButtonHandler}>削除</button></td>
         </tr>
     );

@@ -13,3 +13,8 @@ th, td {
 .add-category-foot {
     margin-left: auto;
 }
+
+.category-management-function{
+    width: 1000px;
+    margin-left: 0;
+}
