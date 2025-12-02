@@ -1,0 +1,28 @@
+table {
+    background-color: #1d2f54;
+    border: solid #5d5d5d;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border: solid #5d5d5d;
+    border-collapse: collapse;
+}
+
+.add-category-foot {
+    margin-left: auto;
+}
+
+.category-management-function {
+    width: 1000px;
+    margin-left: 0;
+}
+
+.registered-categories-expenditure {
+    background-color: #3c2f54;
+}
+
+.registered-categories-income {
+    background-color: #444034;
+}
