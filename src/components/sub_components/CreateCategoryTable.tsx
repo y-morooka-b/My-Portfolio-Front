@@ -1,8 +1,8 @@
 import {JSX} from "react/jsx-runtime";
-import {Categories} from "../../libraries/transceiver/get_categories";
+import {Categories, GetCategoryResponse, get_categories} from "../../libraries/transceiver/get_categories";
 import {create_hash} from "../../libraries/hash_library";
 import {del_category} from "../../libraries/transceiver/del_category";
-import {ChangeEvent, useCallback, useEffect, useState} from "react";
+import {ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useState} from "react";
 import {update_category} from "../../libraries/transceiver/update_category";
 
 const CATEGORY_TYPE_EXPENDITURE = 0;
@@ -21,9 +21,10 @@ const background_color_list = [
  *                                         `id`、`name`、`type`のプロパティを含みます。
  * @returns {JSX.Element} カテゴリのリストを表示するテーブル
  */
-const CreateCategoryTable = ({categories, is_manage}: {
+const CreateCategoryTable = ({categories, is_manage, setCategoryResponse}: {
     categories: Categories[],
-    is_manage: boolean
+    is_manage: boolean,
+    setCategoryResponse: Dispatch<SetStateAction<GetCategoryResponse | undefined>>
 }): JSX.Element => {
     let income_and_expenditure = [
         '支出',
@@ -48,7 +49,7 @@ const CreateCategoryTable = ({categories, is_manage}: {
                 is_manage
                     ? categories.map(category => {
                         const hash = 'CategoryTable-' + create_hash(category.id + category.name + category.type);
-                        return <CreateCategoryManageSet key={hash} key_hash={hash} category={category}/>
+                        return <CreateCategoryManageSet key={hash} key_hash={hash} category={category} setCategoryResponse={setCategoryResponse}/>
                     })
                     : categories.map(category => {
                         const hash = create_hash(category.id + category.name + category.type);
@@ -85,16 +86,17 @@ const CreateCategorySet = ({category, income_and_expenditure}: {
 /**
  * カテゴリ管理のデータを表示するためのテーブル行を生成する関数コンポーネント
  *
- * @param {String} hash - キー用のハッシュ
  * @param {Object} props - コンポーネントに渡されるプロパティオブジェクト
+ * @param {String} props.key_hash - キー用のハッシュ
  * @param {Categories} props.category - カテゴリの詳細情報を含むオブジェクト
- * @param {String[]} props.income_and_expenditure - 収支情報を表す文字列の配列
+ * @param {Dispatch<SetStateAction<GetCategoryResponse | undefined>>} props.setCategoryResponse - カテゴリの更新や削除などの変更後にカテゴリレスポンスを更新するためのステート設定関数
  *
  * @returns {JSX.Element} カテゴリデータを持つテーブル行を表すJSX要素
  */
-const CreateCategoryManageSet = ({key_hash, category}: {
+const CreateCategoryManageSet = ({key_hash, category, setCategoryResponse}: {
     key_hash: String,
     category: Categories,
+    setCategoryResponse: Dispatch<SetStateAction<GetCategoryResponse | undefined>>
 }): JSX.Element => {
 
     const [categoryName, setCategoryName] = useState('');
@@ -114,10 +116,20 @@ const CreateCategoryManageSet = ({key_hash, category}: {
     };
 
     const delButtonHandler = useCallback(() => {
-        del_category(category.id);
+        del_category(category.id)
+            .then(
+                () => {
+                    get_categories(setCategoryResponse);
+                }
+            );
     }, [category.id]);
     const updateButtonHandler = useCallback(() => {
-        update_category(category.id, categoryName, categoryType);
+        update_category(category.id, categoryName, categoryType)
+            .then(
+                () => {
+                    get_categories(setCategoryResponse);
+                }
+            );
     }, [category.id, categoryName, categoryType]);
 
     return (

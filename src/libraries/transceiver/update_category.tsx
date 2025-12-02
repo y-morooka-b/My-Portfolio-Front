@@ -6,8 +6,8 @@ import {axiosInstance} from '../axios_instance'
  * @param name
  * @param type
  */
-export async function update_category(id: number, name: string, type: number) {
-    axiosInstance.post('update_category', {'id': id,'name': name, 'type': type})
+export async function update_category(id: number, name: string, type: number): Promise<void> {
+    await axiosInstance.post('update_category', {'id': id,'name': name, 'type': type})
         .then(red => {
             console.log(red.data);
         })

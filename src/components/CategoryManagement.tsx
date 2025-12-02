@@ -14,7 +14,6 @@ const CategoryManagement = () => {
     useEffect(() => {
         const fetchData = async () => {
             get_categories(setCategoryResponse);
-
         }
         fetchData();
     }, []);
@@ -77,7 +76,7 @@ const CategoryManagement = () => {
                                 ? <div>Loading...</div>
                                 : categoryResponse.categories.length === 0
                                     ? <div>No categories</div>
-                                    : <CreateCategoryTable categories={categoryResponse.categories} is_manage={true}/>
+                                    : <CreateCategoryTable categories={categoryResponse.categories} is_manage={true} setCategoryResponse={setCategoryResponse}/>
                         }
                     </div>
                 </div>

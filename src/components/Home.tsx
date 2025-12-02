@@ -22,7 +22,7 @@ const Home = () => {
                     ? <div>Loading...</div>
                     : categoryResponse.categories.length === 0
                         ? <div>No categories</div>
-                        : <CreateCategoryTable categories={categoryResponse.categories} is_manage={false}/>
+                        : <CreateCategoryTable categories={categoryResponse.categories} is_manage={false} setCategoryResponse={setCategoryResponse}/>
             }
         </div>
     );
