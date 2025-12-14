@@ -1,6 +1,7 @@
 import "./components_css/MainSidebar.css";
 import HomeIcon from '@mui/icons-material/Home';
 import CategoryIcon from '@mui/icons-material/Category';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 export const MainSidebar = () => {
     let sidebar_data = [
@@ -13,6 +14,11 @@ export const MainSidebar = () => {
             title: "カテゴリ管理",
             icon: <CategoryIcon />,
             link: "/category_management"
+        },
+        {
+            title: "収支管理",
+            icon: <CalendarMonthIcon />,
+            link: "/revenue_and_expense_management"
         }
     ];
 

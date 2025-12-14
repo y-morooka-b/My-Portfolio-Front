@@ -1,0 +1,54 @@
+.RevenueAndExpenseManagement-container {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.RevenueAndExpenseMatrix-details-summary {
+    width: 1200px;
+    border-bottom: 2px solid;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    list-style: none; /* デフォルトの矢印を消す（念のため） */
+}
+
+.RevenueAndExpenseMatrix-details-summary::before {
+    content: '▶';
+    transition: transform 0.2s ease;
+}
+
+/* 開いてるときに矢印を回転！ */
+details[open] > .RevenueAndExpenseMatrix-details-summary::before {
+    transform: rotate(90deg);
+}
+
+.RevenueAndExpenseMatrix-details-summary-title {
+    width: 85%;
+    margin: 0;
+    padding: 0;
+}
+
+.RevenueAndExpenseMatrix-details-head {
+    border-bottom: 1px solid;
+    font-weight: bold;
+    font-size: 1.1em;
+    background-color: #575757;
+    color: white;
+}
+
+.RevenueAndExpenseMatrix-details-body {
+    padding: 10px 0;
+    border-bottom: 1px solid #818181;
+}
+
+.RevenueAndExpenseMatrix-details-summary-amount {
+    margin: 0 10px;
+}
+
+.RevenueAndExpenseMatrix-comment textarea {
+    min-height: auto;
+    height: 1.5em; /* 1行分の高さ（フォントサイズに応じて調整） */
+    line-height: 1.5;
+    width: 100%
+}
