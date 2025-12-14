@@ -1,6 +1,7 @@
 import "./components_css/App.css";
 import Home from "./components/Home";
 import CategoryManagement from "./components/CategoryManagement";
+import RevenueAndExpenseManagement from "./components/RevenueAndExpenseManagement";
 import {MainSidebar} from "./MainSidebar";
 
 function App() {
@@ -16,6 +17,8 @@ function App() {
                             return <Home />;
                         case "/category_management" :
                             return <CategoryManagement />;
+                        case "/revenue_and_expense_management" :
+                            return <RevenueAndExpenseManagement />;
                         default:
                             return <Home />;
                     }
