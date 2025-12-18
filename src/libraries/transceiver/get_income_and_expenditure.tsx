@@ -32,7 +32,12 @@ export interface ResponseGetIncomeAndExpenditure {
     matrix_set_list: IncomeAndExpenditureMatrixSet[];
 }
 
-
+/**
+ * 1月の収支を取得する
+ * @param setIncomeAndExpenditure
+ * @param year
+ * @param month
+ */
 export async function get_income_and_expenditure(setIncomeAndExpenditure: Dispatch<SetStateAction<any>>, year: number, month: number) {
     axiosInstance.post<ResponseGetIncomeAndExpenditure>('get_income_and_expenditure', {
         'year': year,

@@ -1,8 +1,9 @@
-import {useState, useEffect, ChangeEvent, JSX} from 'react';
+import React, {useState, useEffect, ChangeEvent, JSX, createContext, useContext} from 'react';
 import {create_hash} from "../libraries/hash_library";
 import {GetCategoryResponse, get_categories} from "../libraries/transceiver/get_categories";
 import {
     get_income_and_expenditure,
+    IncomeAndExpenditureMatrixSet,
     IncomeAndExpenditureRecord,
     ResponseGetIncomeAndExpenditure
 } from "../libraries/transceiver/get_income_and_expenditure";
@@ -20,6 +21,17 @@ const income_and_expenditure = [
     '支出',
     '収入'
 ];
+
+interface TotalIncomeExpenditure {
+    totalIncome: number,
+    totalExpenditure: number,
+}
+
+interface CommonContextProps {
+    categoryResponse: GetCategoryResponse | undefined
+}
+
+const CommonContext = createContext({categoryResponse: undefined} as CommonContextProps);
 
 /**
  * 収支管理のためのコンポーネント
@@ -51,10 +63,20 @@ const RevenueAndExpenseManagement = () => {
     const [responseGetIncomeAndExpenditure, setResponseGetIncomeAndExpenditure] = useState<ResponseGetIncomeAndExpenditure>();
     const [categoryResponse, setCategoryResponse] = useState<GetCategoryResponse>();
     const [targetDate, setTargetDate] = useState(new Intl.DateTimeFormat('ja-JP', DATE_FORMAT_OPTIONS).format(date));
+    const [totalIncomeExpenditure, setTotalIncomeExpenditure] = useState<TotalIncomeExpenditure>({totalIncome: 0, totalExpenditure: 0});
 
     useEffect(() => {
         get_categories(setCategoryResponse);
         get_income_and_expenditure(setResponseGetIncomeAndExpenditure, date.getFullYear(), date.getMonth() + 1)
+            .then(() => {
+                let totalIncome = 0;
+                let totalExpenditure = 0;
+                responseGetIncomeAndExpenditure?.matrix_set_list.forEach(matrix_set => {
+                    totalIncome += matrix_set.income;
+                    totalExpenditure += matrix_set.expenditure;
+                });
+                setTotalIncomeExpenditure({totalIncome, totalExpenditure});
+            });
     }, []);
 
     const income_and_expenditure_registration = (formData: FormData) => {
@@ -74,17 +96,40 @@ const RevenueAndExpenseManagement = () => {
     };
 
     return (
-        <>
+        <CommonContext.Provider value={ {categoryResponse} }>
             <h2>収支管理</h2>
             <br/>
             <h3>{targetDate}</h3>
+            <table>
+                <thead>
+                <tr>
+                    <th>
+                        合計収入
+                    </th>
+                    <th>
+                        合計支出
+                    </th>
+                    <th>
+                        合計±
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{totalIncomeExpenditure.totalIncome}</td>
+                    <td>{totalIncomeExpenditure.totalExpenditure}</td>
+                    <td>{totalIncomeExpenditure.totalIncome - totalIncomeExpenditure.totalExpenditure}</td>
+                </tr>
+                </tbody>
+            </table>
+            <br/>
             <div className="container-fluid RevenueAndExpenseManagement-container">
                 <div className="row">
                     <div className="col">
                         <h4>収支表</h4>
                         {
                             responseGetIncomeAndExpenditure &&
-                            <MonthsCalendar responseGetIncomeAndExpenditure={responseGetIncomeAndExpenditure} categoryResponse={categoryResponse}/>
+                            <MonthsCalendar responseGetIncomeAndExpenditure={responseGetIncomeAndExpenditure}/>
                         }
                     </div>
                     <div className="col-3">
@@ -137,7 +182,7 @@ const RevenueAndExpenseManagement = () => {
                     </div>
                 </div>
             </div>
-        </>
+        </CommonContext.Provider>
     );
 }
 
@@ -152,12 +197,10 @@ const RevenueAndExpenseManagement = () => {
  *
  * @param {Object} props - コンポーネントのプロパティ
  * @param {ResponseGetIncomeAndExpenditure} props.responseGetIncomeAndExpenditure - 収支データを含むレスポンス
- * @param {GetCategoryResponse | undefined} props.categoryResponse - カテゴリ情報を含むレスポンス(任意)
  * @returns {JSX.Element} 収支カレンダーを表示するテーブル要素
  */
-const MonthsCalendar = ({responseGetIncomeAndExpenditure, categoryResponse}: {
+const MonthsCalendar = ({responseGetIncomeAndExpenditure}: {
     responseGetIncomeAndExpenditure: ResponseGetIncomeAndExpenditure,
-    categoryResponse: GetCategoryResponse | undefined
 }): JSX.Element => {
     return (
         <table>
@@ -179,7 +222,7 @@ const MonthsCalendar = ({responseGetIncomeAndExpenditure, categoryResponse}: {
                             {
                                 matrix_set.matrix.length === 0 ?
                                     <span>なし</span> :
-                                    <RevenueAndExpenseMatrix income={matrix_set.income} expenditure={matrix_set.expenditure} matrix={matrix_set.matrix} categoryResponse={categoryResponse}/>
+                                    <RevenueAndExpenseMatrix matrix_set={matrix_set} />
                             }
                         </td>
                     </tr>
@@ -191,30 +234,35 @@ const MonthsCalendar = ({responseGetIncomeAndExpenditure, categoryResponse}: {
 }
 
 /**
- * 収支詳細とその内訳を表示するコンポーネント
+ * 収支の詳細マトリックスを表示するコンポーネント
  *
- * @param {Object} params - RevenueAndExpenseMatrixコンポーネントで必要なプロパティ
- * @param {number} params.income - 表示する収入の合計額
- * @param {number} params.expenditure - 表示する支出の合計額
- * @param {IncomeAndExpenditureRecord[]} params.matrix - トランザクションやカテゴリを表す収支記録のリスト
- * @param {GetCategoryResponse | undefined} params.categoryResponse - トランザクションのカテゴリ情報を含むレスポンスオブジェクト(オプション)
+ * @param {Object} props - コンポーネントのプロパティ
+ * @param {IncomeAndExpenditureMatrixSet} props.matrix_set - 収支データとマトリックス詳細を含むデータセット
  *
- * @returns {JSX.Element} 提供された収支データの要約と詳細な内訳を表示します
+ * @returns {JSX.Element} 収支明細マトリックスを表示するJSXコンポーネント
  */
-const RevenueAndExpenseMatrix = ({income, expenditure, matrix, categoryResponse}: {
-    income: number,
-    expenditure: number,
-    matrix: IncomeAndExpenditureRecord[],
-    categoryResponse: GetCategoryResponse | undefined
+const RevenueAndExpenseMatrix = ({matrix_set}: {
+    matrix_set: IncomeAndExpenditureMatrixSet,
 }): JSX.Element => {
+
+    const [income, setIncome] = useState(matrix_set.income);
+    const [expenditure, setExpenditure] = useState(matrix_set.expenditure);
+    const [matrix, setMatrix] = useState(matrix_set.matrix);
+
+    const update_today = (matrix_set: IncomeAndExpenditureMatrixSet) => {
+        setIncome(matrix_set.income);
+        setExpenditure(matrix_set.expenditure);
+        setMatrix(matrix_set.matrix);
+    }
+
     return (
         <details>
             <summary className='RevenueAndExpenseMatrix-details-summary'>
                 <span className="container RevenueAndExpenseMatrix-details-summary-title">
                     <span className="row align-items-start">
                         <span className="col-2"><strong>詳細</strong></span>
-                        <span className="col">収入<span className="RevenueAndExpenseMatrix-details-summary-amount">{income}</span>円</span>
-                        <span className="col">支出<span className="RevenueAndExpenseMatrix-details-summary-amount">{expenditure}</span>円</span>
+                        <span className="col">収入<span className="RevenueAndExpenseMatrix-details-summary-amount income-summary-amount">{income}</span>円</span>
+                        <span className="col">支出<span className="RevenueAndExpenseMatrix-details-summary-amount expenditure-summary-amount">{expenditure}</span>円</span>
                         <span className="col">±<span className="RevenueAndExpenseMatrix-details-summary-amount">{income - expenditure}</span>円</span>
                     </span>
                 </span>
@@ -232,7 +280,7 @@ const RevenueAndExpenseMatrix = ({income, expenditure, matrix, categoryResponse}
                 {
                     matrix.map(row => {
                         let hash = create_hash(row.id + row.date);
-                        return <RevenueAndExpenseRow key={`RevenueAndExpenseMatrix-${hash}`} row={row} categoryResponse={categoryResponse}/>
+                        return <RevenueAndExpenseRow key={`RevenueAndExpenseMatrix-${hash}`} row={row} update_today={update_today}/>
                     })
                 }
             </div>
@@ -246,14 +294,15 @@ const RevenueAndExpenseMatrix = ({income, expenditure, matrix, categoryResponse}
  *
  * @param {object} props - コンポーネントのプロパティ
  * @param {IncomeAndExpenditureRecord} props.row - 単一の収支記録を表すオブジェクト
- * @param {GetCategoryResponse | undefined} props.categoryResponse - カテゴリ情報を含むレスポンス
  *
  * @returns {JSX.Element} カテゴリ、場所、金額、コメントを含む収支明細の行を表示
  */
-const RevenueAndExpenseRow = ({row, categoryResponse}: {
+const RevenueAndExpenseRow = ({row, update_today}: {
     row: IncomeAndExpenditureRecord,
-    categoryResponse: GetCategoryResponse | undefined
+    update_today: (matrix_set: IncomeAndExpenditureMatrixSet) => void
 }):JSX.Element => {
+    const {categoryResponse} = useContext<CommonContextProps>(CommonContext);
+
     const [id] = useState(row.id);
     const [date] = useState(row.date);
     const [amount, setAmount] = useState(row.amount);
@@ -269,7 +318,9 @@ const RevenueAndExpenseRow = ({row, categoryResponse}: {
             place,
             categoryId,
             comment,
-        );
+        ).then(() => {
+
+        });
     }
     const deleteButtonHandler = () => {
         del_income_and_expenditure(id);
@@ -291,12 +342,11 @@ const RevenueAndExpenseRow = ({row, categoryResponse}: {
     return (
         <span className="row RevenueAndExpenseMatrix-details-body">
             <span className="col-2">
-                <select name="category_id" onChange={handleInputCategoryId}> {
+                <select name="category_id" onChange={handleInputCategoryId} > {
                     categoryResponse?.categories.map(
                         category => {
-                            const hash = create_hash(category.id + category.name + category.type);
-                            return <option key={`CategoryList-${hash}`} value={categoryId}
-                                           selected={row.category_id === category.id}>
+                            const hash = create_hash(row.id + row.date + category.id + category.name + category.type);
+                            return <option key={`CategoryList-${hash}`} value={categoryId} selected={categoryId === category.id}>
                                 {`${category.name} : ${income_and_expenditure[category.type]}`}
                             </option>
                         })
