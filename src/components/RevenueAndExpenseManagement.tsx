@@ -87,10 +87,22 @@ const RevenueAndExpenseManagement = () => {
             Number(category_id),
             String(comment),
         ).then(() => {
-            console.log(date);
-            if (Object.keys(setMatrixSetList).length !== 0) {
-                let tmp = new Date(date as string);
-                get_income_and_expenditure_matrix_set(tmp.getFullYear(), tmp.getMonth() + 1, tmp.getDay(), setMatrixSetList[date as string]);
+            let tmp = new Date(date as string);
+
+            if (!(date as string in setMatrixSetList)) {
+                get_income_and_expenditure(setResponseGetIncomeAndExpenditure, tmp.getFullYear(), tmp.getMonth() + 1)
+                    .then(() => {
+                        let totalIncome = 0;
+                        let totalExpenditure = 0;
+                        responseGetIncomeAndExpenditure?.matrix_set_list.forEach(matrix_set => {
+                            totalIncome += matrix_set.income;
+                            totalExpenditure += matrix_set.expenditure;
+                        });
+                        setTotalIncomeExpenditure({totalIncome, totalExpenditure});
+                    });
+            } else {
+                let date_str = `${tmp.getFullYear()}-${tmp.getMonth() + 1}-${tmp.getDate().toString().padStart(2, '0')}`;
+                get_income_and_expenditure_matrix_set(tmp.getFullYear(), tmp.getMonth() + 1, tmp.getDate(), setMatrixSetList[date_str]);
             }
         });
     };
