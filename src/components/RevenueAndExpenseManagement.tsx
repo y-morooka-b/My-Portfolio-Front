@@ -1,9 +1,9 @@
-import React, {useState, useEffect, JSX, createContext, useContext, Dispatch, SetStateAction} from 'react';
+import React, {useState, useEffect} from 'react';
+import {useAtom} from 'jotai';
 import {create_hash} from "../libraries/hash_library";
-import {GetCategoryResponse, get_categories} from "../libraries/transceiver/get_categories";
+import {get_categories} from "../libraries/transceiver/get_categories";
 import {
     get_income_and_expenditure,
-    IncomeAndExpenditureMatrixSet,
     ResponseGetIncomeAndExpenditure
 } from "../libraries/transceiver/get_income_and_expenditure";
 import {set_income_and_expenditure} from "../libraries/transceiver/set_income_and_expenditure";
@@ -11,22 +11,17 @@ import '../components_css/RevenueAndExpenseManagement.css';
 import {get_income_and_expenditure_matrix_set} from "../libraries/transceiver/get_income_and_expenditure_matrixSet";
 import {DATE_FORMAT_LOCALE, DATE_FORMAT_OPTIONS, INCOME_AND_EXPENDITURE} from "../FixedValue";
 import MonthsCalendar from "./sub_components/MonthsCalendar";
+import {
+    categoryResponseAtom,
+    setMatrixSetListAtom,
+    targetDateAtom
+} from "../jotai_atom/RevenueAndExpenseManagement_Atom";
 
 interface TotalIncomeExpenditure {
     totalIncome: number,
     totalExpenditure: number,
 }
 
-export interface CommonContextProps {
-    categoryResponse: GetCategoryResponse | undefined,
-    targetDate: Date,
-}
-export const CommonContext = createContext({categoryResponse: undefined} as CommonContextProps);
-
-export interface ChildContextProps {
-    setMatrixSet:  Dispatch<SetStateAction<IncomeAndExpenditureMatrixSet>> | undefined
-}
-export const ChildeContext = createContext( {setMatrixSet: undefined} as ChildContextProps);
 
 /**
  * 収支管理のためのコンポーネント
@@ -54,16 +49,19 @@ export const ChildeContext = createContext( {setMatrixSet: undefined} as ChildCo
  *   新しいエントリの登録が可能
  */
 const RevenueAndExpenseManagement = () => {
-    const {setMatrixSet} = useContext<ChildContextProps>(ChildeContext);
+    const [setMatrixSetList] = useAtom(setMatrixSetListAtom);
+    const [targetDate, setTargetDate] = useAtom(targetDateAtom);
+    const [categoryResponse, setCategoryResponse] = useAtom(categoryResponseAtom);
 
     const [responseGetIncomeAndExpenditure, setResponseGetIncomeAndExpenditure] = useState<ResponseGetIncomeAndExpenditure>();
-    const [categoryResponse, setCategoryResponse] = useState<GetCategoryResponse>();
-    const [targetDate, setTargetDate] = useState(new Date());
     const [totalIncomeExpenditure, setTotalIncomeExpenditure] = useState<TotalIncomeExpenditure>({totalIncome: 0, totalExpenditure: 0});
 
     useEffect(() => {
+        let now = new Date();
+        setTargetDate(now);
+
         get_categories(setCategoryResponse);
-        get_income_and_expenditure(setResponseGetIncomeAndExpenditure, targetDate.getFullYear(), targetDate.getMonth() + 1)
+        get_income_and_expenditure(setResponseGetIncomeAndExpenditure, now.getFullYear(), now.getMonth() + 1)
             .then(() => {
                 let totalIncome = 0;
                 let totalExpenditure = 0;
@@ -90,15 +88,15 @@ const RevenueAndExpenseManagement = () => {
             String(comment),
         ).then(() => {
             console.log(date);
-            if (setMatrixSet !== undefined) {
+            if (Object.keys(setMatrixSetList).length !== 0) {
                 let tmp = new Date(date as string);
-                get_income_and_expenditure_matrix_set(tmp.getFullYear(), tmp.getMonth() + 1, tmp.getDay(), setMatrixSet);
+                get_income_and_expenditure_matrix_set(tmp.getFullYear(), tmp.getMonth() + 1, tmp.getDay(), setMatrixSetList[date as string]);
             }
         });
     };
 
     return (
-        <CommonContext.Provider value={ {categoryResponse, targetDate} }>
+        <>
             <h2>収支管理</h2>
             <br/>
             <h3>{Intl.DateTimeFormat(DATE_FORMAT_LOCALE, DATE_FORMAT_OPTIONS).format(targetDate)}</h3>
@@ -184,7 +182,7 @@ const RevenueAndExpenseManagement = () => {
                     </div>
                 </div>
             </div>
-        </CommonContext.Provider>
+        </>
     );
 }
 

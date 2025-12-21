@@ -3,10 +3,16 @@
  */
 
 // 日付関連
-/** @type string 日付のロケーション */
+/**
+ * 日付のロケーション
+ * @type string
+ */
 export const DATE_FORMAT_LOCALE: string = 'ja-JP';
 
-/** @type DateTimeFormatOptions 日付のフォーマットのオプション */
+/**
+ * 日付のフォーマットのオプション
+ * @type DateTimeFormatOptions
+ */
 export const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long'
@@ -15,7 +21,10 @@ export const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
 
 // その他
 
-/** @type string[] 収支情報の日本語化用配列 */
+/**
+ * 収支情報の日本語化用配列
+ * @type string[]
+ */
 export const INCOME_AND_EXPENDITURE: string[] = [
     '支出',
     '収入'

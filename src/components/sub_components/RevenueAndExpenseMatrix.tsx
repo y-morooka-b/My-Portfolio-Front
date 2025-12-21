@@ -1,19 +1,9 @@
-import {JSX, useState} from "react";
-
+import {JSX, useEffect, useState} from "react";
 import {IncomeAndExpenditureMatrixSet} from "../../libraries/transceiver/get_income_and_expenditure";
-import { ChildeContext } from "../RevenueAndExpenseManagement";
 import {create_hash} from "../../libraries/hash_library";
 import RevenueAndExpenseRow from "./RevenueAndExpenseRow";
-
-/**
- * 収支の詳細マトリックスを表示するコンポーネント
- *
- * @param {Object} props - コンポーネントのプロパティ
- * @param {IncomeAndExpenditureMatrixSet} props.matrix_set - 収支データとマトリックス詳細を含むデータセット
- *
- * @returns {JSX.Element} 収支明細マトリックスを表示するJSXコンポーネント
- */
-
+import {setMatrixSetListAtom, targetDateAtom} from "../../jotai_atom/RevenueAndExpenseManagement_Atom";
+import {useAtom} from "jotai";
 
 /**
  * 収支の詳細マトリックスを表示するコンポーネント
@@ -26,11 +16,21 @@ import RevenueAndExpenseRow from "./RevenueAndExpenseRow";
 const RevenueAndExpenseMatrix = ({matrix_set}: {
     matrix_set: IncomeAndExpenditureMatrixSet,
 }): JSX.Element => {
+    const [targetDate] = useAtom(targetDateAtom);
+    const [setMatrixSetList, setSetMatrixSetList] = useAtom(setMatrixSetListAtom);
 
     const [matrixSet, setMatrixSet] = useState(matrix_set);
 
+    useEffect(() => {
+        let tmp = targetDate;
+        tmp.setDate(matrix_set.day);
+        let date_str = `${tmp.getFullYear()}-${tmp.getMonth() + 1}-${tmp.getDate().toString().padStart(2, '0')}`;
+        setMatrixSetList[date_str] = setMatrixSet;
+        setSetMatrixSetList(setMatrixSetList);
+    }, []);
+
     return (
-        <ChildeContext.Provider value={{setMatrixSet}}>
+        <>
             <details>
                 <summary className='RevenueAndExpenseMatrix-details-summary'>
                 <span className="container RevenueAndExpenseMatrix-details-summary-title">
@@ -58,13 +58,12 @@ const RevenueAndExpenseMatrix = ({matrix_set}: {
                     {
                         matrixSet.matrix.map(row => {
                             let hash = create_hash(row.id + row.date);
-                            return <RevenueAndExpenseRow key={`RevenueAndExpenseMatrix-${hash}`} row={row}
-                                                         day={matrixSet.day}/>
+                            return <RevenueAndExpenseRow key={`RevenueAndExpenseMatrix-${hash}`} row={row} day={matrixSet.day}/>
                         })
                     }
                 </div>
             </details>
-        </ChildeContext.Provider>
+        </>
     );
 }
 
