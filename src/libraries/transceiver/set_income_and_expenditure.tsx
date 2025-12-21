@@ -1,5 +1,13 @@
 import {axiosInstance} from '../axios_instance'
 
+/**
+ * 収支の追加
+ * @param date
+ * @param amount
+ * @param place
+ * @param category_id
+ * @param comment
+ */
 export const set_income_and_expenditure = async (
     date: string,
     amount: number,

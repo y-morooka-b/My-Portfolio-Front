@@ -4,6 +4,7 @@ import {create_hash} from "../../libraries/hash_library";
 import {del_category} from "../../libraries/transceiver/del_category";
 import {ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useState} from "react";
 import {update_category} from "../../libraries/transceiver/update_category";
+import {INCOME_AND_EXPENDITURE} from "../../FixedValue";
 
 const CATEGORY_TYPE_EXPENDITURE = 0;
 const CATEGORY_TYPE_INCOME = 1;
@@ -26,11 +27,6 @@ const CreateCategoryTable = ({categories, is_manage, setCategoryResponse}: {
     is_manage: boolean,
     setCategoryResponse: Dispatch<SetStateAction<GetCategoryResponse | undefined>>
 }): JSX.Element => {
-    let income_and_expenditure = [
-        '支出',
-        '収入'
-    ];
-
     return (
         <table>
             <thead>
@@ -53,7 +49,7 @@ const CreateCategoryTable = ({categories, is_manage, setCategoryResponse}: {
                     })
                     : categories.map(category => {
                         const hash = create_hash(category.id + category.name + category.type);
-                        return <CreateCategorySet key={`CategoryTable-${hash}`} category={category} income_and_expenditure={income_and_expenditure}/>
+                        return <CreateCategorySet key={`CategoryTable-${hash}`} category={category} income_and_expenditure={INCOME_AND_EXPENDITURE}/>
                     })
             }
             </tbody>
