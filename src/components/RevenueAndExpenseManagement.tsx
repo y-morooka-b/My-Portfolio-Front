@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useAtom} from 'jotai';
-import {create_hash} from "../libraries/hash_library";
+import {create_hash, format_date} from "../libraries/hash_library";
 import {get_categories} from "../libraries/transceiver/get_categories";
 import {
     get_income_and_expenditure,
@@ -14,14 +14,14 @@ import MonthsCalendar from "./sub_components/MonthsCalendar";
 import {
     categoryResponseAtom,
     setMatrixSetListAtom,
-    targetDateAtom
+    targetDateAtom, dayTotalIncomeExpenditureListAtom
 } from "../jotai_atom/RevenueAndExpenseManagement_Atom";
+import {Dictionary} from "../libraries/expansion_type";
 
-interface TotalIncomeExpenditure {
-    totalIncome: number,
-    totalExpenditure: number,
+export interface DayTotalIncomeExpenditure {
+    dayTotalIncome: number,
+    dayTotalExpenditure: number,
 }
-
 
 /**
  * 収支管理のためのコンポーネント
@@ -51,27 +51,54 @@ interface TotalIncomeExpenditure {
 const RevenueAndExpenseManagement = () => {
     const [setMatrixSetList] = useAtom(setMatrixSetListAtom);
     const [targetDate, setTargetDate] = useAtom(targetDateAtom);
-    const [categoryResponse, setCategoryResponse] = useAtom(categoryResponseAtom);
+    const [categoryResponse, setCategoryResponse] = useAtom(categoryResponseAtom)
+    const [totalIncomeExpenditureList, setTotalIncomeExpenditureList] = useAtom(dayTotalIncomeExpenditureListAtom);
 
     const [responseGetIncomeAndExpenditure, setResponseGetIncomeAndExpenditure] = useState<ResponseGetIncomeAndExpenditure>();
-    const [totalIncomeExpenditure, setTotalIncomeExpenditure] = useState<TotalIncomeExpenditure>({totalIncome: 0, totalExpenditure: 0});
+    const [totalIncome, setTotalIncome] = useState(0);
+    const [totalExpenditure,setTotalExpenditure] = useState(0);
 
+    /**
+     * コンポーネント起動・更新時
+     */
     useEffect(() => {
         let now = new Date();
         setTargetDate(now);
 
         get_categories(setCategoryResponse);
-        get_income_and_expenditure(setResponseGetIncomeAndExpenditure, now.getFullYear(), now.getMonth() + 1)
-            .then(() => {
-                let totalIncome = 0;
-                let totalExpenditure = 0;
-                responseGetIncomeAndExpenditure?.matrix_set_list.forEach(matrix_set => {
-                    totalIncome += matrix_set.income;
-                    totalExpenditure += matrix_set.expenditure;
-                });
-                setTotalIncomeExpenditure({totalIncome, totalExpenditure});
-            });
+        get_income_and_expenditure(setResponseGetIncomeAndExpenditure, now.getFullYear(), now.getMonth() + 1);
     }, []);
+
+    /**
+     * 1月野収支が取れた後の処理
+     */
+    useEffect(() => {
+        let tmp: Dictionary<string, DayTotalIncomeExpenditure> = {};
+        responseGetIncomeAndExpenditure?.matrix_set_list.forEach(matrix_set => {
+            let str_date = format_date(targetDate.getFullYear(), targetDate.getMonth() + 1, matrix_set.day);
+            tmp[str_date] = {
+                dayTotalIncome: matrix_set.income,
+                dayTotalExpenditure: matrix_set.expenditure
+            };
+        });
+        setTotalIncomeExpenditureList(tmp);
+    }, [responseGetIncomeAndExpenditure]);
+
+    /**
+     * 合計収支の計算と確定
+     */
+    useEffect(() => {
+        let tmp_totalIncome = 0;
+        let tmp_totalExpenditure = 0;
+
+        for (let key in totalIncomeExpenditureList) {
+            tmp_totalIncome += totalIncomeExpenditureList[key].dayTotalIncome;
+            tmp_totalExpenditure += totalIncomeExpenditureList[key].dayTotalExpenditure;
+        }
+
+        setTotalIncome(tmp_totalIncome);
+        setTotalExpenditure(tmp_totalExpenditure);
+    }, [totalIncomeExpenditureList]);
 
     const income_and_expenditure_registration = (formData: FormData) => {
         let date = formData.get('date');
@@ -90,16 +117,7 @@ const RevenueAndExpenseManagement = () => {
             let tmp = new Date(date as string);
 
             if (!(date as string in setMatrixSetList)) {
-                get_income_and_expenditure(setResponseGetIncomeAndExpenditure, tmp.getFullYear(), tmp.getMonth() + 1)
-                    .then(() => {
-                        let totalIncome = 0;
-                        let totalExpenditure = 0;
-                        responseGetIncomeAndExpenditure?.matrix_set_list.forEach(matrix_set => {
-                            totalIncome += matrix_set.income;
-                            totalExpenditure += matrix_set.expenditure;
-                        });
-                        setTotalIncomeExpenditure({totalIncome, totalExpenditure});
-                    });
+                get_income_and_expenditure(setResponseGetIncomeAndExpenditure, tmp.getFullYear(), tmp.getMonth() + 1);
             } else {
                 let date_str = `${tmp.getFullYear()}-${tmp.getMonth() + 1}-${tmp.getDate().toString().padStart(2, '0')}`;
                 get_income_and_expenditure_matrix_set(tmp.getFullYear(), tmp.getMonth() + 1, tmp.getDate(), setMatrixSetList[date_str]);
@@ -128,9 +146,9 @@ const RevenueAndExpenseManagement = () => {
                 </thead>
                 <tbody>
                 <tr>
-                    <td>{totalIncomeExpenditure.totalIncome}</td>
-                    <td>{totalIncomeExpenditure.totalExpenditure}</td>
-                    <td>{totalIncomeExpenditure.totalIncome - totalIncomeExpenditure.totalExpenditure}</td>
+                    <td>{totalIncome}</td>
+                    <td>{totalExpenditure}</td>
+                    <td>{totalIncome - totalExpenditure}</td>
                 </tr>
                 </tbody>
             </table>

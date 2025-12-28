@@ -7,6 +7,7 @@ import {GetCategoryResponse} from "../libraries/transceiver/get_categories";
 import {Dispatch, SetStateAction} from "react";
 import {IncomeAndExpenditureMatrixSet} from "../libraries/transceiver/get_income_and_expenditure";
 import {Dictionary} from "../libraries/expansion_type";
+import {DayTotalIncomeExpenditure} from "../components/RevenueAndExpenseManagement";
 
 /**
  * ターゲット日付を管理・保存するための状態アトム
@@ -33,4 +34,21 @@ export const categoryResponseAtom: import('jotai').Atom<GetCategoryResponse | un
  *
  * @type {import('jotai').Atom<Dictionary<string, Dispatch<SetStateAction<IncomeAndExpenditureMatrixSet>>>>}
  */
-export const setMatrixSetListAtom: WritableAtom<Dictionary<string, Dispatch<SetStateAction<IncomeAndExpenditureMatrixSet>>>, [Dictionary<string, Dispatch<SetStateAction<IncomeAndExpenditureMatrixSet>>>], void> = atom<Dictionary<string, Dispatch<SetStateAction<IncomeAndExpenditureMatrixSet>>>>({});
+export const setMatrixSetListAtom:
+    WritableAtom<
+        Dictionary<string, Dispatch<SetStateAction<IncomeAndExpenditureMatrixSet>>>,
+        [Dictionary<string, Dispatch<SetStateAction<IncomeAndExpenditureMatrixSet>>>],
+        void
+    > = atom<Dictionary<string, Dispatch<SetStateAction<IncomeAndExpenditureMatrixSet>>>>({});
+
+/**
+ * dayTotalIncomeExpenditureListAtom は辞書型の状態を格納するAtom
+ * このAtomのキーは文字列で、特定の日付を設定
+ * 指定されたキーに対応する収入と支出の合計額を格納します。
+ *
+ * 初期値:
+ * - 空の辞書オブジェクト
+ *
+ * @type {import('jotai').Atom<Dictionary<string, DayTotalIncomeExpenditure>>}
+ */
+export const dayTotalIncomeExpenditureListAtom = atom<Dictionary<string, DayTotalIncomeExpenditure >>({});
