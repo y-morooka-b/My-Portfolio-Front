@@ -1,8 +1,12 @@
 import {JSX, useEffect, useState} from "react";
 import {IncomeAndExpenditureMatrixSet} from "../../libraries/transceiver/get_income_and_expenditure";
-import {create_hash} from "../../libraries/hash_library";
+import {create_hash, format_date} from "../../libraries/hash_library";
 import RevenueAndExpenseRow from "./RevenueAndExpenseRow";
-import {setMatrixSetListAtom, targetDateAtom} from "../../jotai_atom/RevenueAndExpenseManagement_Atom";
+import {
+    dayTotalIncomeExpenditureListAtom,
+    setMatrixSetListAtom,
+    targetDateAtom
+} from "../../jotai_atom/RevenueAndExpenseManagement_Atom";
 import {useAtom} from "jotai";
 
 /**
@@ -18,16 +22,40 @@ const RevenueAndExpenseMatrix = ({matrix_set}: {
 }): JSX.Element => {
     const [targetDate] = useAtom(targetDateAtom);
     const [setMatrixSetList, setSetMatrixSetList] = useAtom(setMatrixSetListAtom);
+    const [totalIncomeExpenditureList, setTotalIncomeExpenditureList] = useAtom(dayTotalIncomeExpenditureListAtom);
 
     const [matrixSet, setMatrixSet] = useState(matrix_set);
 
     useEffect(() => {
         let tmp = targetDate;
         tmp.setDate(matrix_set.day);
-        let date_str = `${tmp.getFullYear()}-${tmp.getMonth() + 1}-${tmp.getDate().toString().padStart(2, '0')}`;
+        let date_str = format_date(tmp.getFullYear(), tmp.getMonth() + 1, tmp.getDate());
+
         setMatrixSetList[date_str] = setMatrixSet;
         setSetMatrixSetList(setMatrixSetList);
     }, []);
+
+    /**
+     * 更新が入った日ごとの収支合計を更新する
+     */
+    useEffect(() => {
+        let tmp = targetDate;
+        tmp.setDate(matrix_set.day);
+        let date_str = format_date(tmp.getFullYear(), tmp.getMonth() + 1, tmp.getDate());
+
+        totalIncomeExpenditureList[date_str] = {
+            dayTotalIncome: matrixSet.income,
+            dayTotalExpenditure: matrixSet.expenditure,
+        };
+
+        setTotalIncomeExpenditureList((prev) => ({
+            ...prev,
+            [date_str]: {
+                dayTotalIncome: matrixSet.income,
+                dayTotalExpenditure: matrixSet.expenditure,
+            },
+        }));
+    }, [matrixSet]);
 
     return (
         <>

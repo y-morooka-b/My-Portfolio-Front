@@ -40,10 +40,7 @@ const RevenueAndExpenseRow = ({row, day}: { row: IncomeAndExpenditureRecord, day
             categoryId,
             comment,
         ).then(() => {
-            console.log(row);
-            console.log(row.date);
             if (Object.keys(setMatrixSetList).length !== 0) {
-                console.log(setMatrixSetList);
                 get_income_and_expenditure_matrix_set(targetDate.getFullYear(), targetDate.getMonth() + 1, day, setMatrixSetList[row.date as string]);
             }
         });

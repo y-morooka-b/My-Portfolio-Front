@@ -70,7 +70,7 @@ const RevenueAndExpenseManagement = () => {
     }, []);
 
     /**
-     * 1月野収支が取れた後の処理
+     * 1か月の収支が取れた後の処理
      */
     useEffect(() => {
         let tmp: Dictionary<string, DayTotalIncomeExpenditure> = {};
