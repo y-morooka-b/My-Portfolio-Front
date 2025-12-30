@@ -32,10 +32,11 @@
 | @types/react                | 19.2.7    |
 | @types/spark-md5            | 3.0.5     |
 | axios                       | 1.13.2    |
+| date-fns                    | 4.1.0     |
+| jotai                       | 2.16.0    |
 | react-dom                   | 19.2.0    |
 | react-scripts               | 5.0.1     |
 | react                       | 19.2.0    |
 | spark-md5                   | 3.0.2     |
 | typescript                  | 4.9.5     |
 | web-vitals                  | 2.1.4     |
-
