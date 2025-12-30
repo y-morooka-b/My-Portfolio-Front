@@ -25,6 +25,7 @@ export const update_income_and_expenditure = async (
                 id: id,
                 date: date,
                 amount: amount,
+                place: place,
                 category_id: category_id,
                 comment: comment
             }
