@@ -52,3 +52,15 @@ details[open] > .RevenueAndExpenseMatrix-details-summary::before {
     line-height: 1.5;
     width: 100%
 }
+
+.TargetDateAndTime {
+    padding: 2px 5px;
+    background-color: rgba(0, 0, 0, 0);
+    border: solid #d7d7d7;
+    color: #d7d7d7;
+}
+
+.TargetDateAndTime::-webkit-calendar-picker-indicator {
+    filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(0deg);
+    cursor: pointer;
+}

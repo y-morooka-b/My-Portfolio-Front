@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useAtom} from 'jotai';
+import {format} from 'date-fns';
 import {create_hash, format_key_date} from "../libraries/hash_library";
 import {get_categories} from "../libraries/transceiver/get_categories";
 import {
@@ -9,7 +10,7 @@ import {
 import {set_income_and_expenditure} from "../libraries/transceiver/set_income_and_expenditure";
 import '../components_css/RevenueAndExpenseManagement.css';
 import {get_income_and_expenditure_matrix_set} from "../libraries/transceiver/get_income_and_expenditure_matrixSet";
-import {DATE_FORMAT_LOCALE, DATE_FORMAT_OPTIONS, INCOME_AND_EXPENDITURE} from "../FixedValue";
+import {INCOME_AND_EXPENDITURE} from "../FixedValue";
 import MonthsCalendar from "./sub_components/MonthsCalendar";
 import {
     categoryResponseAtom,
@@ -126,11 +127,19 @@ const RevenueAndExpenseManagement = () => {
         });
     };
 
+    const change_target_date = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let target_date = new Date(e.target.value);
+        setTargetDate(target_date);
+        get_income_and_expenditure(setResponseGetIncomeAndExpenditure, target_date.getFullYear(), target_date.getMonth() + 1);
+    }
+
     return (
         <>
             <h2>収支管理</h2>
             <br/>
-            <h3>{Intl.DateTimeFormat(DATE_FORMAT_LOCALE, DATE_FORMAT_OPTIONS).format(targetDate)}</h3>
+            <h3><input type="month" className="TargetDateAndTime" value={format(targetDate, 'yyyy-MM')} onChange={change_target_date}/></h3>
+
+            <br/>
             <table>
                 <thead>
                 <tr>
