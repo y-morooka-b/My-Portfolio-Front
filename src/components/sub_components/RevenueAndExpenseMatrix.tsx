@@ -1,6 +1,6 @@
 import {JSX, useEffect, useState} from "react";
 import {IncomeAndExpenditureMatrixSet} from "../../libraries/transceiver/get_income_and_expenditure";
-import {create_hash, format_date} from "../../libraries/hash_library";
+import {create_hash, format_key_date} from "../../libraries/hash_library";
 import RevenueAndExpenseRow from "./RevenueAndExpenseRow";
 import {
     dayTotalIncomeExpenditureListAtom,
@@ -27,9 +27,8 @@ const RevenueAndExpenseMatrix = ({matrix_set}: {
     const [matrixSet, setMatrixSet] = useState(matrix_set);
 
     useEffect(() => {
-        let tmp = targetDate;
-        tmp.setDate(matrix_set.day);
-        let date_str = format_date(tmp.getFullYear(), tmp.getMonth() + 1, tmp.getDate());
+        targetDate.setDate(matrix_set.day);
+        let date_str = format_key_date(targetDate);
 
         setMatrixSetList[date_str] = setMatrixSet;
         setSetMatrixSetList(setMatrixSetList);
@@ -39,9 +38,8 @@ const RevenueAndExpenseMatrix = ({matrix_set}: {
      * 更新が入った日ごとの収支合計を更新する
      */
     useEffect(() => {
-        let tmp = targetDate;
-        tmp.setDate(matrix_set.day);
-        let date_str = format_date(tmp.getFullYear(), tmp.getMonth() + 1, tmp.getDate());
+        targetDate.setDate(matrix_set.day);
+        let date_str = format_key_date(targetDate);
 
         totalIncomeExpenditureList[date_str] = {
             dayTotalIncome: matrixSet.income,

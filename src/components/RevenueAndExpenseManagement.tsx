@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useAtom} from 'jotai';
-import {create_hash, format_date} from "../libraries/hash_library";
+import {create_hash, format_key_date} from "../libraries/hash_library";
 import {get_categories} from "../libraries/transceiver/get_categories";
 import {
     get_income_and_expenditure,
@@ -75,7 +75,8 @@ const RevenueAndExpenseManagement = () => {
     useEffect(() => {
         let tmp: Dictionary<string, DayTotalIncomeExpenditure> = {};
         responseGetIncomeAndExpenditure?.matrix_set_list.forEach(matrix_set => {
-            let str_date = format_date(targetDate.getFullYear(), targetDate.getMonth() + 1, matrix_set.day);
+            targetDate.setDate(matrix_set.day);
+            let str_date = format_key_date(targetDate);
             tmp[str_date] = {
                 dayTotalIncome: matrix_set.income,
                 dayTotalExpenditure: matrix_set.expenditure
@@ -119,7 +120,7 @@ const RevenueAndExpenseManagement = () => {
             if (!(date as string in setMatrixSetList)) {
                 get_income_and_expenditure(setResponseGetIncomeAndExpenditure, tmp.getFullYear(), tmp.getMonth() + 1);
             } else {
-                let date_str = `${tmp.getFullYear()}-${tmp.getMonth() + 1}-${tmp.getDate().toString().padStart(2, '0')}`;
+                let date_str = format_key_date(tmp);
                 get_income_and_expenditure_matrix_set(tmp.getFullYear(), tmp.getMonth() + 1, tmp.getDate(), setMatrixSetList[date_str]);
             }
         });

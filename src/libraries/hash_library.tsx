@@ -1,4 +1,5 @@
 import SparkMD5 from "spark-md5";
+import { format } from 'date-fns';
 
 /**
  * 入力テキストのハッシュを生成
@@ -11,13 +12,11 @@ export function create_hash(text: string): string {
 }
 
 /**
- * 日付の成型
+ * 日付をkeyに成型
  * - yyyy-mm-dd の形式
  *
- * @param year
- * @param month
- * @param day
+ * @param origin
  */
-export function format_date(year: number, month: number, day: number): string {
-    return `${year}-${month}-${day.toString().padStart(2, '0')}`;
+export function format_key_date(origin: Date): string {
+    return format(origin, 'yyyy-MM-dd');
 }
