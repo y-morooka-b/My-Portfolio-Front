@@ -2,7 +2,7 @@ import {PieChart, Pie, Cell, Tooltip, Legend} from 'recharts';
 import {MonthlySumInfo} from "../../libraries/transceiver/get_monthly_overview";
 
 /**
- * WrapPieChartは円グラフをレンダリングするReactの機能コンポーネント
+ * WrapPieChartは円グラフをレンダリングするReactのラップコンポーネント
  * 各セグメントがカテゴリを表し、異なる色でスタイリングされた円グラフを使用して月次サマリーのリストを可視化
  *
  * @param {Object} props - コンポーネントのプロパティ

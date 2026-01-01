@@ -4,15 +4,10 @@ import {create_hash} from "../../libraries/hash_library";
 import {del_category} from "../../libraries/transceiver/del_category";
 import {ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useState} from "react";
 import {update_category} from "../../libraries/transceiver/update_category";
-import {INCOME_AND_EXPENDITURE} from "../../FixedValue";
+import {BACKGROUND_COLOR_LIST, INCOME_AND_EXPENDITURE} from "../../FixedValue";
 
 const CATEGORY_TYPE_EXPENDITURE = 0;
 const CATEGORY_TYPE_INCOME = 1;
-
-const background_color_list = [
-    'registered-categories-expenditure',
-    'registered-categories-income'
-];
 
 /**
  * カテゴリオブジェクトのリストからHTMLテーブルを生成する
@@ -71,7 +66,7 @@ const CreateCategorySet = ({category, income_and_expenditure}: {
     income_and_expenditure: String[]
 }): JSX.Element => {
     return (
-        <tr className={background_color_list[category.type]}>
+        <tr className={BACKGROUND_COLOR_LIST[category.type]}>
             <td>{category.id}</td>
             <td>{category.name}</td>
             <td>{income_and_expenditure[category.type]}</td>
@@ -129,7 +124,7 @@ const CreateCategoryManageSet = ({key_hash, category, setCategoryResponse}: {
     }, [category.id, categoryName, categoryType]);
 
     return (
-        <tr className={background_color_list[category.type]}>
+        <tr className={BACKGROUND_COLOR_LIST[category.type]}>
             <td>{category.id}</td>
             <td>
                 <input

@@ -8,6 +8,8 @@ export interface MonthlySumInfo {
 }
 
 export interface ResponseGetMonthlyOverview {
+    total_expenditure: number;
+    total_income: number;
     sum_income_list: MonthlySumInfo[];
     sum_expenditure_list: MonthlySumInfo[];
 }

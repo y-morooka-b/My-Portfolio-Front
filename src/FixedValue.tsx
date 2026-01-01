@@ -10,3 +10,9 @@ export const INCOME_AND_EXPENDITURE: string[] = [
     '支出',
     '収入'
 ];
+
+
+export const BACKGROUND_COLOR_LIST = [
+    'registered-categories-expenditure',
+    'registered-categories-income'
+];
