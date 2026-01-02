@@ -10,5 +10,5 @@
  */
 export function get_now_date(): Date
 {
-    return new Date();
+    return new Date(2025, 11, 30);
 }
