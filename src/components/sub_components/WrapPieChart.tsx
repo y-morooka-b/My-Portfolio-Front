@@ -1,5 +1,6 @@
 import {PieChart, Pie, Cell, Tooltip, Legend} from 'recharts';
 import {MonthlySumInfo} from "../../libraries/transceiver/get_monthly_overview";
+import {JSX} from "react";
 
 /**
  * WrapPieChartは円グラフをレンダリングするReactのラップコンポーネント
@@ -11,7 +12,7 @@ import {MonthlySumInfo} from "../../libraries/transceiver/get_monthly_overview";
  *
  * @returns {JSX.Element} データの視覚化とインタラクションを含むスタイリングされた円グラフ
  */
-const WrapPieChart = ({sum_list}: { sum_list: MonthlySumInfo[]}) => {
+const WrapPieChart = ({sum_list}: { sum_list: MonthlySumInfo[]}): JSX.Element => {
 
     const COLORS = [
         '#D35400',

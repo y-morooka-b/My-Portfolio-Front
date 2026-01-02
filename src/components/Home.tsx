@@ -1,14 +1,13 @@
 import React, {useState, useEffect} from 'react';
 import {get_categories, GetCategoryResponse} from '../libraries/transceiver/get_categories';
 import {get_monthly_overview, ResponseGetMonthlyOverview} from "../libraries/transceiver/get_monthly_overview";
-import CreateCategoryTable from "./sub_components/CreateCategoryTable";
 import WrapPieChart from "./sub_components/WrapPieChart";
 import {format} from "date-fns";
 import OverviewTable from "./sub_components/OverviewTable";
 
 const Home = () => {
     const [targetDate, setTargetDate] = useState<Date>();
-    const [categoryResponse, setCategoryResponse] = useState<GetCategoryResponse>();
+    const [, setCategoryResponse] = useState<GetCategoryResponse>();
     const [monthlyOverview, setMonthlyOverview] = useState<ResponseGetMonthlyOverview>();
 
     useEffect(() => {

@@ -11,8 +11,11 @@ export const INCOME_AND_EXPENDITURE: string[] = [
     '収入'
 ];
 
-
-export const BACKGROUND_COLOR_LIST = [
+/**
+ * 収支カテゴリの背景色配列
+ * @type string[]
+ */
+export const BACKGROUND_COLOR_LIST: string[] = [
     'registered-categories-expenditure',
     'registered-categories-income'
 ];
