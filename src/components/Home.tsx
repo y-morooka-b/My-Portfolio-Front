@@ -4,6 +4,7 @@ import {get_monthly_overview, ResponseGetMonthlyOverview} from "../libraries/tra
 import WrapPieChart from "./sub_components/WrapPieChart";
 import {format} from "date-fns";
 import OverviewTable from "./sub_components/OverviewTable";
+import {get_now_date} from "../libraries/date_library";
 
 const Home = () => {
     const [targetDate, setTargetDate] = useState<Date>();
@@ -11,8 +12,7 @@ const Home = () => {
     const [monthlyOverview, setMonthlyOverview] = useState<ResponseGetMonthlyOverview>();
 
     useEffect(() => {
-        let now = new Date();
-        setTargetDate(now);
+        setTargetDate(get_now_date());
 
         const fetchData = async () => {
             get_categories(setCategoryResponse);
