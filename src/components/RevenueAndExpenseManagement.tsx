@@ -18,6 +18,7 @@ import {
     targetDateAtom, dayTotalIncomeExpenditureListAtom
 } from "../jotai_atom/RevenueAndExpenseManagement_Atom";
 import {Dictionary} from "../libraries/expansion_type";
+import {get_now_date} from "../libraries/date_library";
 
 export interface DayTotalIncomeExpenditure {
     dayTotalIncome: number,
@@ -63,7 +64,7 @@ const RevenueAndExpenseManagement = () => {
      * コンポーネント起動・更新時
      */
     useEffect(() => {
-        let now = new Date();
+        let now = get_now_date();
         setTargetDate(now);
 
         get_categories(setCategoryResponse);
